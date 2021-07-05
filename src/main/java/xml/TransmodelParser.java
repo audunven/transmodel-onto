@@ -30,6 +30,11 @@ public class TransmodelParser {
 		
 		long startTime = System.nanoTime();
 		Set<Relation> relations = getRelations(file);
+		
+//		for (Relation rel : relations) {
+//			System.out.println(rel.getRelationId() + ", " + rel.getSourceRoleName() + ", " + rel.getTargetClassId());
+//		}
+		
 		long endTime = System.nanoTime();
 		long timeElapsed = endTime - startTime;
 		System.out.println("Execution time in milliseconds for relations: " + timeElapsed / 1000000);
@@ -42,18 +47,37 @@ public class TransmodelParser {
 
 		startTime = System.nanoTime();
 		Set<OntologyClass> classes = getOntologyClasses(file, class2ParentClassMap);
+		
+		System.out.println("Classes");
+		for (OntologyClass cls : classes) {
+			System.out.println(cls.getId() + "|" + cls.getName() + "|" + cls.getParentClass() + "|" + cls.getDefinition());
+		}
+		System.out.println("End classes\n");
+		
 		endTime = System.nanoTime();
 		timeElapsed = endTime - startTime;
 		System.out.println("Execution time in milliseconds for classes: " + timeElapsed / 1000000);
 		
 		startTime = System.nanoTime();
-		Set<OntologyDataProperty> dataProperties = getOntologyDataProperties(file);
+		Set<OntologyDataProperty> dataProperties = getOntologyDataProperties(file);		
+		
+		System.out.println("Data properties");
+		for (OntologyDataProperty dp : dataProperties) {
+			System.out.println(dp.getId() + "|" + dp.getName() + "|" + dp.getDataType() + "|" + dp.getSourceClassId() + "|" + dp.getSourceClassName());
+		}
+		System.out.println("End data properties\n");
+		
 		endTime = System.nanoTime();
 		timeElapsed = endTime - startTime;
 		System.out.println("Execution time in milliseconds for data properties: " + timeElapsed / 1000000);
 		
 		startTime = System.nanoTime();
 		Set<OntologyObjectProperty> objectProperties = getOntologyObjectProperties(file);
+		System.out.println("\nObject properties");
+		for (OntologyObjectProperty op : objectProperties) {
+			System.out.println(op.getId() + "|" + op.getName() + "|" + op.getSourceClassId() + "|" + op.getSourceClassName() + "|" + op.getTargetClassId() + "|" + op.getTargetClassName());
+		}
+		System.out.println("End object properties\n");
 		endTime = System.nanoTime();
 		timeElapsed = endTime - startTime;
 		System.out.println("Execution time in milliseconds for object properties: " + timeElapsed / 1000000);
@@ -85,7 +109,9 @@ public class TransmodelParser {
 					op = new OntologyObjectProperty.OntologyObjectPropertyBuilder()
 							.setId(rel.getRelationId())
 							.setName(rel.getSourceRoleName())
+							.setSourceClassId(rel.getSourceClassId())
 							.setSourceClassName(rel.getSourceClassName())
+							.setTargetClassId(rel.getTargetClassId())
 							.setTargetClassName(rel.getTargetClassName())
 							.build();
 					
@@ -124,6 +150,7 @@ public class TransmodelParser {
 		NodeList nList = doc.getElementsByTagName("element");
 
 		String classId = null;
+		String className = null;
 
 		for (int i = 0; i < nList.getLength(); i++) {
 
@@ -136,6 +163,7 @@ public class TransmodelParser {
 				if (eElement.getAttribute("xmi:type").equals("uml:Class")) {
 
 					classId = eElement.getAttribute("xmi:idref");
+					className = eElement.getAttribute("name");
 
 					NodeList childNodes = eElement.getChildNodes();
 
@@ -191,6 +219,7 @@ public class TransmodelParser {
 
 									dp = new OntologyDataProperty.OntologyDataPropertyBuilder()
 											.setSourceClassId(classId)
+											.setSourceClassName(className)
 											.setId(attributeId)
 											.setName(attributeName)
 											.setDataType(dataType)
@@ -343,7 +372,7 @@ public class TransmodelParser {
 							if (sourceChildNode.getNodeName().equals("role")) {
 								
 								Element sourceRoleElement = (Element) sourceChildNode;
-								sourceRoleName = sourceRoleElement.getAttribute("role");
+								sourceRoleName = sourceRoleElement.getAttribute("name");
 							}
 						}
 					}
@@ -367,7 +396,7 @@ public class TransmodelParser {
 							if (targetChildNode.getNodeName().equals("role")) {
 								
 								Element targetRoleElement = (Element) targetChildNode;
-								targetRoleName = targetRoleElement.getAttribute("role");
+								targetRoleName = targetRoleElement.getAttribute("name");
 							}
 						}	
 					}
