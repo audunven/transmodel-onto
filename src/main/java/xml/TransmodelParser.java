@@ -242,7 +242,7 @@ public class TransmodelParser {
 
 	}
 	
-	private static Map<String, String> getClass2ParentClassMap (Set<Relation> relations) {
+	public static Map<String, String> getClass2ParentClassMap (Set<Relation> relations) {
 		
 		Map<String, String> class2ParentClassMap = new HashMap<String, String>();
 		
@@ -316,7 +316,7 @@ public class TransmodelParser {
 
 	}
 
-	private static Set<Relation> getRelations (String fileName) throws ParserConfigurationException, SAXException, IOException {
+	public static Set<Relation> getRelations (String fileName) throws ParserConfigurationException, SAXException, IOException {
 
 		Set<Relation> relations = new HashSet<Relation>();
 
