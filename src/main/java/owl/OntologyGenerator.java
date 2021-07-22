@@ -39,8 +39,8 @@ public class OntologyGenerator {
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
-		IRI ontologyIRI = IRI.create("http://www.reisenavet.no/ontologies/transmodelOnto.owl");
-		File owl_file = new File("./files/TransmodelOnto.owl");
+		IRI ontologyIRI = IRI.create("http://www.reisenavet.no/ontologies/transmodelOntoNewModes.owl");
+		File owl_file = new File("./files/TransmodelOntoNewModes.owl");
 		IRI documentIRI = IRI.create(owl_file.toURI());
 		SimpleIRIMapper mapper = new SimpleIRIMapper(ontologyIRI, documentIRI);
 		manager.addIRIMapper(mapper);
@@ -49,7 +49,7 @@ public class OntologyGenerator {
 
 		OWLDataFactory factory = manager.getOWLDataFactory();
 
-		String file = "./files/Transmodel.xml";
+		String file = "./files/Transmodel_NewModes.xml";
 		Set<Relation> relations = TransmodelParser.getRelations(file);
 		Map<String, String> class2ParentClassMap = TransmodelParser.getClass2ParentClassMap(relations);
 
