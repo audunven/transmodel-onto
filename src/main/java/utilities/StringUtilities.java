@@ -7,7 +7,7 @@ public class StringUtilities {
 	
 	public static void main(String[] args) {
 		
-		String inputString = "VEHICLE TYPE AT POINT";
+		String inputString = "To Lower Case";
 				
 		System.out.println(toMixedCase(inputString));
 		
@@ -51,7 +51,19 @@ public class StringUtilities {
 	
 	public static String toMixedCase (String inputString) {		
 		
-		return CaseUtils.toCamelCase(inputString, false, " ".toCharArray());
+		String mixedCase = null;
+		
+		if (inputString.contains(" ")) {
+		
+			mixedCase = CaseUtils.toCamelCase(inputString, false, " ".toCharArray());
+		} else {
+			char c[] = inputString.toCharArray();
+			c[0] += 32;
+			inputString = new String(c);
+			mixedCase = inputString;
+		}
+		
+		return mixedCase;
 		
 	}
 

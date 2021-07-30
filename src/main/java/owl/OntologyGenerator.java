@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.EntityType;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -40,7 +41,7 @@ public class OntologyGenerator {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
 		IRI ontologyIRI = IRI.create("http://www.reisenavet.no/ontologies/transmodelOntoNewModes.owl");
-		File owl_file = new File("./files/TransmodelOntoNewModes.owl");
+		File owl_file = new File("./files/TransmodelOntoCombined.owl");
 		IRI documentIRI = IRI.create(owl_file.toURI());
 		SimpleIRIMapper mapper = new SimpleIRIMapper(ontologyIRI, documentIRI);
 		manager.addIRIMapper(mapper);
@@ -49,11 +50,11 @@ public class OntologyGenerator {
 
 		OWLDataFactory factory = manager.getOWLDataFactory();
 
-		String file = "./files/Transmodel_NewModes.xml";
+		String file = "./files/Transmodel_Combined.xml";
 		Set<Relation> relations = TransmodelParser.getRelations(file);
 		Map<String, String> class2ParentClassMap = TransmodelParser.getClass2ParentClassMap(relations);
 
-		//declare classes
+		//declare classes as well as their definition and label (proper name from UML model)
 		Set<OntologyClass> classes = TransmodelParser.getOntologyClasses(file, class2ParentClassMap);
 
 		OWLDataFactory df = OWLManager.getOWLDataFactory();
@@ -62,19 +63,29 @@ public class OntologyGenerator {
 		
 		OWLAxiom declarationAxiom = null;
 		
+		OWLAnnotation annotation = null;
+		OWLAxiom annotationAxiom = null;
+		
+		OWLAnnotation label = null;
+		OWLAxiom labelAxiom = null;
+		
 		for (OntologyClass cls : classes) {
 			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
+			annotation = df.getOWLAnnotation(df.getRDFSComment(), df.getOWLLiteral(cls.getDefinition(), "en"));			
 			declarationAxiom = df.getOWLDeclarationAxiom(classEntity);
+			annotationAxiom = df.getOWLAnnotationAssertionAxiom(classEntity.asOWLClass().getIRI(), annotation);
+			label = df.getOWLAnnotation(df.getRDFSLabel(), df.getOWLLiteral(cls.getName(), "en"));
+			labelAxiom = df.getOWLAnnotationAssertionAxiom(classEntity.asOWLClass().getIRI(), label);
 			manager.addAxiom(onto, declarationAxiom);
+			manager.addAxiom(onto, annotationAxiom);
+			manager.addAxiom(onto, labelAxiom);
 
 		}
 
 		manager.saveOntology(onto, documentIRI);
-
 		
 		
-		//TODO: CREATE TAXONOMY
-		//manager.addAxiom(ont, factory.getOWLSubClassOfAxiom(man, person));
+		//CREATE TAXONOMY
 		OWLEntity parentClassEntity = null;
 		OWLAxiom subclassOfAxiom = null;
 		
@@ -94,6 +105,8 @@ public class OntologyGenerator {
 
 		for (OntologyObjectProperty op : objectProperties) {
 			if (!op.getName().equals("")) {
+				System.out.println("Object Properties: ");
+				System.out.println(op.getName());
 				classEntity = df.getOWLEntity(EntityType.OBJECT_PROPERTY, IRI.create(ontologyIRI + "#" + StringUtilities.toMixedCase(op.getName())));
 				declarationAxiom = df.getOWLDeclarationAxiom(classEntity);
 				manager.addAxiom(onto, declarationAxiom);			
@@ -144,6 +157,8 @@ public class OntologyGenerator {
 		
 		for (OntologyDataProperty dp : dataProperties) {
 			if (!dp.getName().equals("")) {
+				System.out.println("Data Properties: ");
+				System.out.println(dp.getName());
 				classEntity = df.getOWLEntity(EntityType.DATA_PROPERTY, IRI.create(ontologyIRI + "#" + StringUtilities.toMixedCase(dp.getName())));
 				declarationAxiom = df.getOWLDeclarationAxiom(classEntity);
 				manager.addAxiom(onto, declarationAxiom);

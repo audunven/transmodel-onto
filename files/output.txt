@@ -1,4 +1,4 @@
-Execution time in milliseconds for relations: 1574
+Execution time in milliseconds for relations: 1609
 Execution time in milliseconds for generalisations: 1
 Classes
 EAID_15CA6ED5_75EB_473d_9DF8_18726B058F98|TEMPLATE VEHICLE JOURNEY|VEHICLE JOURNEY|A repeating VEHICLE JOURNEY for which a frequency has been specified, either as a HEADWAY JOURNEY GROUP (e.g. every 20 minutes) or a RHYTHMICAL JOURNEY GROUP  (e.g. at 15, 27 and 40 minutes past the hour). It may thus represent multiple journeys. 
@@ -1150,7 +1150,7 @@ EAID_DE20679A_FBDE_4f45_92D1_15BD07F20FBF|PASSENGER STOP ASSIGNMENT|STOP ASSIGNM
 EAID_24E6EECC_B3FF_428b_BA9D_CA08A7B12F47|CHARGING MOMENT|TYPE OF VALUE|A classification of FARE PRODUCTs according to the payment method and the account location: pre-payment with cancellation (throw-away), pre-payment with debit on a value card, pre-payment without consumption registration (pass), post-payment etc.
 End classes
 
-Execution time in milliseconds for classes: 286
+Execution time in milliseconds for classes: 277
 Data properties
 EAID_4C08D82C_01B4_4d97_96B5_BC5DD67C4F57|Recycling|boolean|EAID_68362739_1681_4bbf_B770_93C8F709B92A|RUBBISH DISPOSAL
 EAID_230E26C7_9BC2_4373_8640_C9776C6E2797|Id|WaitingRoomEquipmentIdType|EAID_8197D890_4D1B_483e_8110_4AD9EDF33BAE|WAITING ROOM EQUIPMENT
@@ -3286,7 +3286,7 @@ EAID_6B5EDF04_976E_48d6_883D_EDF4355A5DF6|FreeToUse|boolean|EAID_A2EF2937_B248_4
 EAID_A883B35A_95B6_4ef3_A1DF_1A7CAF226811|HasFreeConnectingReservations|boolean|EAID_6B4824AB_2D56_4ead_9886_5E8B8CEE3BE7|RESERVING
 End data properties
 
-Execution time in milliseconds for data properties: 276
+Execution time in milliseconds for data properties: 297
 
 Object properties
 EAID_41121FC3_84B8_4849_A60A_83CD3D9A1B78|classsified as|EAID_3286CC2C_FDC1_482c_B724_3DF398BCC124|TRAVELLING ENTITY|EAID_6348E8D5_36EA_444b_B959_66AECC2633D5|TYPE OF TRAVELLING ENTITY
@@ -4122,7 +4122,7 @@ EAID_05CA2E08_EB21_4083_98EA_32C514E0EB08|paid with|EAID_B218BFFB_38C7_40be_B261
 EAID_447803F0_975B_4d86_B72B_3261D937FC78|triggering|EAID_F2FE87ED_ED88_471a_A2A0_D807D88618C0|ACCOUNT REVIVE EVENT|EAID_ED540171_97CA_4232_B2F8_C6ACA1F51977|ACCOUNT REVIVE ENTRY
 End object properties
 
-Execution time in milliseconds for object properties: 960
+Execution time in milliseconds for object properties: 971
 Number of classes: 1004
 Number of data properties: 2132
 Number of relations: 2999
