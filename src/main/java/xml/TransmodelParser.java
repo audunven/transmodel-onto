@@ -31,10 +31,6 @@ public class TransmodelParser {
 		long startTime = System.nanoTime();
 		Set<Relation> relations = getRelations(file);
 		
-//		for (Relation rel : relations) {
-//			System.out.println(rel.getRelationId() + ", " + rel.getSourceRoleName() + ", " + rel.getTargetClassId());
-//		}
-		
 		long endTime = System.nanoTime();
 		long timeElapsed = endTime - startTime;
 		System.out.println("Execution time in milliseconds for relations: " + timeElapsed / 1000000);
@@ -50,7 +46,7 @@ public class TransmodelParser {
 		
 		System.out.println("Classes");
 		for (OntologyClass cls : classes) {
-			System.out.println(cls.getId() + "|" + cls.getName() + "|" + cls.getParentClass() + "|" + cls.getDefinition());
+			System.out.println(cls.getId() + "|" + cls.getName() + "|" + cls.getParentClass() + "|" + cls.getDefinition() + "|" + cls.getModule());
 		}
 		System.out.println("End classes\n");
 		
@@ -268,6 +264,7 @@ public class TransmodelParser {
 		String classId = null;
 		String className = null;
 		String documentation = null;
+		String module = null;
 
 		NodeList elementList = doc.getElementsByTagName("element");
 
@@ -295,6 +292,12 @@ public class TransmodelParser {
 							Element propertiesElement = (Element) childNode;
 							documentation = propertiesElement.getAttribute("documentation");
 						}
+						
+						if (childNode.getNodeName().equals("extendedProperties")) {
+							
+							Element extendedPropertiesElement = (Element) childNode;
+							module = findModule(extendedPropertiesElement.getAttribute("package_name"));
+						}
 
 					}		
 
@@ -303,6 +306,7 @@ public class TransmodelParser {
 							.setName(className)
 							.setDefinition(documentation)
 							.setParentClass(class2ParentClassMap.get(className))
+							.setModule(module)
 							.build();
 
 					classes.add(cls);
@@ -314,6 +318,39 @@ public class TransmodelParser {
 
 		return classes;
 
+	}
+	
+	private static String findModule (String packageName) {
+		
+		String module = null;
+		
+		if (packageName.startsWith("CC")) {
+			module = "_COMMON_CONCEPTS";
+		} else if (packageName.startsWith("NT")) {
+			module = "_NETWORK_TOPOLOGY";
+		} else if (packageName.startsWith("TI")) {
+			module = "_TIMING_INFORMATION";
+		} else if (packageName.startsWith("AC")) {
+			module = "_ADDITIONAL_COMMON_CONCEPTS";
+		} else if (packageName.startsWith("OM")) {
+			module = "_OPERATIONS_MONITORING";
+		} else if (packageName.startsWith("FP") || packageName.startsWith("FZ") || packageName.startsWith("FS")
+				|| packageName.startsWith("AR") || packageName.startsWith("SD") || packageName.startsWith("ST")
+				|| packageName.startsWith("SE") || packageName.startsWith("FM") || packageName.startsWith("FR")
+				|| packageName.startsWith("FC") || packageName.startsWith("FE") || packageName.startsWith("FF")) {
+			module = "_FARE_MAANGEMENT";
+		} else if (packageName.startsWith("PI") || packageName.startsWith("TD") || packageName.startsWith("QC")
+				|| packageName.startsWith("QR") || packageName.startsWith("FQ")) {
+			module = "_PASSENGER_INFORMATION";
+		} else if (packageName.startsWith("DM")) {
+			module = "_DRIVER_MANAGEMENT";
+		} else if (packageName.startsWith("MI")) {
+			module = "_MANAGEMENT_INFORMATION";
+		} else if (packageName.startsWith("NM")) {
+			module = "_NEW_MODES";
+		}
+		
+		return module;
 	}
 
 	public static Set<Relation> getRelations (String fileName) throws ParserConfigurationException, SAXException, IOException {

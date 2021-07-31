@@ -7,12 +7,14 @@ public class OntologyClass {
 	private String name;
 	private String definition;
 	private String parentClass;
+	private String module;
 	
 	private OntologyClass (OntologyClassBuilder builder) {
 		this.id = builder.id;
 		this.name = builder.name;
 		this.definition = builder.definition;
 		this.parentClass = builder.parentClass;
+		this.module = builder.module;
 	}
 	
 	public static class OntologyClassBuilder {
@@ -21,6 +23,7 @@ public class OntologyClass {
 		private String name;
 		private String definition;
 		private String parentClass;
+		private String module;
 		
 		public OntologyClassBuilder() {}
 		
@@ -41,6 +44,11 @@ public class OntologyClass {
 		
 		public OntologyClassBuilder setParentClass (String parentClass) {
 			this.parentClass = parentClass;
+			return this;
+		}
+		
+		public OntologyClassBuilder setModule (String module) {
+			this.module = module;
 			return this;
 		}
 		
@@ -66,6 +74,11 @@ public class OntologyClass {
 		return parentClass;
 	}
 	
+	
+	public String getModule() {
+		return module;
+	}
+
 	public String toString() {
 		return this.id + " : " + this.name + " : " + this.definition;
 	}

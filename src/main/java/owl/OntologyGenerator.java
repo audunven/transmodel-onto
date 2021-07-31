@@ -54,21 +54,21 @@ public class OntologyGenerator {
 		Set<Relation> relations = TransmodelParser.getRelations(file);
 		Map<String, String> class2ParentClassMap = TransmodelParser.getClass2ParentClassMap(relations);
 
-		//declare classes as well as their definition and label (proper name from UML model)
+		//DECLARE CLASSES, DEFINITIONS AND LABELS (PROPER NAME FROM UML MODEL) 
 		Set<OntologyClass> classes = TransmodelParser.getOntologyClasses(file, class2ParentClassMap);
 
 		OWLDataFactory df = OWLManager.getOWLDataFactory();
 
 		OWLEntity classEntity = null;
-		
+
 		OWLAxiom declarationAxiom = null;
-		
+
 		OWLAnnotation annotation = null;
 		OWLAxiom annotationAxiom = null;
-		
+
 		OWLAnnotation label = null;
 		OWLAxiom labelAxiom = null;
-		
+
 		for (OntologyClass cls : classes) {
 			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
 			annotation = df.getOWLAnnotation(df.getRDFSComment(), df.getOWLLiteral(cls.getDefinition(), "en"));			
@@ -83,20 +83,30 @@ public class OntologyGenerator {
 		}
 
 		manager.saveOntology(onto, documentIRI);
-		
-		
+
+
 		//CREATE TAXONOMY
 		OWLEntity parentClassEntity = null;
 		OWLAxiom subclassOfAxiom = null;
-		
+		OWLEntity moduleClassEntity = null;
+		OWLAxiom moduleAxiom = null;
+
 		for (OntologyClass cls : classes) {
 			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
-			
+
 			if (cls.getParentClass() != null) {//TODO: Check why null is returned in some cases!
-			
-			parentClassEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getParentClass())));
-			subclassOfAxiom = df.getOWLSubClassOfAxiom(classEntity.asOWLClass(), parentClassEntity.asOWLClass());
-			manager.addAxiom(onto, subclassOfAxiom);
+
+				parentClassEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getParentClass())));
+				subclassOfAxiom = df.getOWLSubClassOfAxiom(classEntity.asOWLClass(), parentClassEntity.asOWLClass());
+				manager.addAxiom(onto, subclassOfAxiom);
+			}
+
+			if (cls.getModule() != null) {
+
+				moduleClassEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + cls.getModule()));
+				moduleAxiom = df.getOWLSubClassOfAxiom(classEntity.asOWLClass(), moduleClassEntity.asOWLClass());
+				manager.addAxiom(onto, moduleAxiom);
+
 			}
 		}
 
@@ -105,8 +115,6 @@ public class OntologyGenerator {
 
 		for (OntologyObjectProperty op : objectProperties) {
 			if (!op.getName().equals("")) {
-				System.out.println("Object Properties: ");
-				System.out.println(op.getName());
 				classEntity = df.getOWLEntity(EntityType.OBJECT_PROPERTY, IRI.create(ontologyIRI + "#" + StringUtilities.toMixedCase(op.getName())));
 				declarationAxiom = df.getOWLDeclarationAxiom(classEntity);
 				manager.addAxiom(onto, declarationAxiom);			
@@ -151,51 +159,49 @@ public class OntologyGenerator {
 		}
 
 		onto.add(opDomainsAndRanges);
-		
-		//TODO: DECLARE DATA PROPERTIES AND SET THEIR DOMAIN CLASS AND RANGE
+
+		//TODO: SET CORRECT RANGE DATATYPE FOR DATA PROPERTIES
 		Set<OntologyDataProperty> dataProperties = TransmodelParser.getOntologyDataProperties(file);
-		
+
 		for (OntologyDataProperty dp : dataProperties) {
 			if (!dp.getName().equals("")) {
-				System.out.println("Data Properties: ");
-				System.out.println(dp.getName());
 				classEntity = df.getOWLEntity(EntityType.DATA_PROPERTY, IRI.create(ontologyIRI + "#" + StringUtilities.toMixedCase(dp.getName())));
 				declarationAxiom = df.getOWLDeclarationAxiom(classEntity);
 				manager.addAxiom(onto, declarationAxiom);
 			}
 		}
-		
+
 		//create domain map holding a data property as key and the set of domain classes as values
 		Multimap<String, String> dpDomainMap = createDPDomainMap(dataProperties);
 		Set<OWLAxiom> dpDomainsAndRanges = new HashSet<OWLAxiom>();
-		
+
 		for (OWLDataProperty d : onto.getDataPropertiesInSignature()) {
-			
+
 			//add domain classes associated with data property d from the domain map
 			Collection<String> domainClasses = dpDomainMap.get(d.getIRI().getFragment());
 			Set<OWLClass> owlClassesDomain = new HashSet<OWLClass>();
 			for (String s : domainClasses) {
 				owlClassesDomain.add(OntologyOperations.getClass(s, onto));
 			}
-			
+
 			for (OWLClass c : owlClassesDomain) {
 				if (c != null) {
 					dpDomainsAndRanges.add(df.getOWLDataPropertyDomainAxiom(d, c));
 				}
 			}
-			
+
 			//add range type associated with data property d from type conversion 
-			//FIXME: Using only xsd:string for now, but must add the appropriate data type
+			//TODO: Using only xsd:string for now, but must add the appropriate data type
 			OWLDatatype stringDatatype = factory.getStringOWLDatatype();
 			dpDomainsAndRanges.add(df.getOWLDataPropertyRangeAxiom(d, stringDatatype));
-			
+
 		}
-		
+
 		onto.add(dpDomainsAndRanges);
-		
+
 		//SAVE ONTOLOGY WITH CLASSES, OBJECT PROPERTIES AND DATA PROPERTIES
 		manager.saveOntology(onto, documentIRI);
-		
+
 		//PRINT STATISTICS
 		System.out.println("Classes: " + onto.getClassesInSignature().size());
 		System.out.println("Object Properties: " + onto.getObjectPropertiesInSignature().size());
@@ -203,7 +209,7 @@ public class OntologyGenerator {
 
 
 	}
-	
+
 	public static Multimap<String, String> createDPDomainMap (Set<OntologyDataProperty> dataProperties) {
 
 		Multimap<String, String> domainMap = LinkedHashMultimap.create();
