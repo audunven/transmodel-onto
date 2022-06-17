@@ -10,6 +10,7 @@ public class OntologyObjectProperty {
 	private String targetClassName;
 	private String targetClassId;
 	private boolean functional;
+	private String originalRelationType;
 
 	private OntologyObjectProperty (OntologyObjectPropertyBuilder builder) {
 
@@ -20,6 +21,7 @@ public class OntologyObjectProperty {
 		this.targetClassName = builder.targetClassName;
 		this.targetClassId = builder.targetClassId;
 		this.functional = builder.functional;
+		this.originalRelationType = builder.originalRelationType;
 	}
 
 	public static class OntologyObjectPropertyBuilder {
@@ -31,6 +33,7 @@ public class OntologyObjectProperty {
 		private String targetClassName;
 		private String targetClassId;
 		private boolean functional;
+		private String originalRelationType;
 
 		public OntologyObjectPropertyBuilder() {}
 
@@ -66,6 +69,11 @@ public class OntologyObjectProperty {
 
 		public OntologyObjectPropertyBuilder setFunctional (boolean functional) {
 			this.functional = functional;
+			return this;
+		}		
+
+		public OntologyObjectPropertyBuilder setOriginalRelationType(String originalRelationType) {
+			this.originalRelationType = originalRelationType;
 			return this;
 		}
 
@@ -103,7 +111,9 @@ public class OntologyObjectProperty {
 		return functional;
 	}
 
-
+	public String getOriginalRelationType() {
+		return originalRelationType;
+	}
 
 
 }

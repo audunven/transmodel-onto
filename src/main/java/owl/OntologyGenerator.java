@@ -34,14 +34,33 @@ import utilities.StringUtilities;
 import xml.TransmodelParser;
 
 //see examples on how to create domain and ranges here: https://www.javatips.net/api/org.semanticweb.owlapi.model.owldisjointclassesaxiom
+//see examples on how to create property restrictions here (e.g. line 870): https://github.com/phillord/owl-api/blob/master/contract/src/test/java/org/coode/owlapi/examples/Examples.java
 public class OntologyGenerator {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, ParserConfigurationException, SAXException, IOException, OWLOntologyStorageException {
+		
+//		String xmiFile = "./files/Transmodel_Combined.xml";
+//		String ontologyIRI = "http://www.reisenavet.no/ontologies/transmodelOntoNewModes.owl";
+//		String owlFile = "./files/TransmodelOntoCombined.owl";
+		
+		String xmiFile = "./files/BioDigSirk_160622.xml";
+		String ontologyIRI = "http://www.biodigsirk.no/ontologies/biodigsirkonto.owl";
+		String owlFile = "./files/BioDigSirkOnto.owl";
 
+
+		
+		createOntology(xmiFile, owlFile, ontologyIRI);
+
+	}
+	
+	public static void createOntology(String xmiFile, String owlFile, String ontoIRI) throws OWLOntologyCreationException, ParserConfigurationException, SAXException, IOException, OWLOntologyStorageException {
+		
+		//String file = "./files/Transmodel_Combined.xml";
+		IRI ontologyIRI = IRI.create(ontoIRI);
+		File owl_file = new File(owlFile);
+		
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-
-		IRI ontologyIRI = IRI.create("http://www.reisenavet.no/ontologies/transmodelOntoNewModes.owl");
-		File owl_file = new File("./files/TransmodelOntoCombined.owl");
+		
 		IRI documentIRI = IRI.create(owl_file.toURI());
 		SimpleIRIMapper mapper = new SimpleIRIMapper(ontologyIRI, documentIRI);
 		manager.addIRIMapper(mapper);
@@ -50,12 +69,12 @@ public class OntologyGenerator {
 
 		OWLDataFactory factory = manager.getOWLDataFactory();
 
-		String file = "./files/Transmodel_Combined.xml";
-		Set<Relation> relations = TransmodelParser.getRelations(file);
+		
+		Set<Relation> relations = TransmodelParser.getRelations(xmiFile);
 		Map<String, String> class2ParentClassMap = TransmodelParser.getClass2ParentClassMap(relations);
 
 		//DECLARE CLASSES, DEFINITIONS AND LABELS (PROPER NAME FROM UML MODEL) 
-		Set<OntologyClass> classes = TransmodelParser.getOntologyClasses(file, class2ParentClassMap);
+		Set<OntologyClass> classes = TransmodelParser.getOntologyClasses(xmiFile, class2ParentClassMap);
 
 		OWLDataFactory df = OWLManager.getOWLDataFactory();
 
@@ -68,9 +87,15 @@ public class OntologyGenerator {
 
 		OWLAnnotation label = null;
 		OWLAxiom labelAxiom = null;
+		
+		System.out.println("Printing classes: ");
+		for (OntologyClass c : classes) {
+			System.out.println(c.getName());
+		}
 
 		for (OntologyClass cls : classes) {
-			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
+			//Transmodel: classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
+			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + cls.getName()));
 			annotation = df.getOWLAnnotation(df.getRDFSComment(), df.getOWLLiteral(cls.getDefinition(), "en"));			
 			declarationAxiom = df.getOWLDeclarationAxiom(classEntity);
 			annotationAxiom = df.getOWLAnnotationAssertionAxiom(classEntity.asOWLClass().getIRI(), annotation);
@@ -92,11 +117,12 @@ public class OntologyGenerator {
 		OWLAxiom moduleAxiom = null;
 
 		for (OntologyClass cls : classes) {
-			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
+			//Transmodel: classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
+			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + cls.getName()));
 
 			if (cls.getParentClass() != null) {//TODO: Check why null is returned in some cases!
-
-				parentClassEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getParentClass())));
+				//Transmodel: parentClassEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getParentClass())));
+				parentClassEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + cls.getParentClass()));
 				subclassOfAxiom = df.getOWLSubClassOfAxiom(classEntity.asOWLClass(), parentClassEntity.asOWLClass());
 				manager.addAxiom(onto, subclassOfAxiom);
 			}
@@ -111,11 +137,19 @@ public class OntologyGenerator {
 		}
 
 		//DECLARE OBJECT PROPERTIES AND SET THEIR DOMAIN AND RANGE CLASSES
-		Set<OntologyObjectProperty> objectProperties = TransmodelParser.getOntologyObjectProperties(file);
+		Set<OntologyObjectProperty> objectProperties = TransmodelParser.getOntologyObjectProperties(xmiFile);
+		
+		System.out.println("Printing object properties: ");
+		for (OntologyObjectProperty op : objectProperties) {
+			System.out.println(op.getName());
+		}
 
+		//FIXME: StringUtilities.toMixedCase is only relevant for the Transmodel XMI where associations and attributes contain white space, e.g. "prepared by".
 		for (OntologyObjectProperty op : objectProperties) {
 			if (!op.getName().equals("")) {
-				classEntity = df.getOWLEntity(EntityType.OBJECT_PROPERTY, IRI.create(ontologyIRI + "#" + StringUtilities.toMixedCase(op.getName())));
+				//classEntity = df.getOWLEntity(EntityType.OBJECT_PROPERTY, IRI.create(ontologyIRI + "#" + StringUtilities.toLowerCase(op.getName())));
+				classEntity = df.getOWLEntity(EntityType.OBJECT_PROPERTY, IRI.create(ontologyIRI + "#" + op.getName()));
+				System.out.println("Printing classEntity: " + classEntity);
 				declarationAxiom = df.getOWLDeclarationAxiom(classEntity);
 				manager.addAxiom(onto, declarationAxiom);			
 			}
@@ -157,15 +191,24 @@ public class OntologyGenerator {
 			}
 
 		}
-
+		
+		System.out.println("Printing domains and ranges axioms for OPs: ");
+		System.out.println(opDomainsAndRanges);
+		
 		onto.add(opDomainsAndRanges);
 
 		//TODO: SET CORRECT RANGE DATATYPE FOR DATA PROPERTIES
-		Set<OntologyDataProperty> dataProperties = TransmodelParser.getOntologyDataProperties(file);
+		Set<OntologyDataProperty> dataProperties = TransmodelParser.getOntologyDataProperties(xmiFile);
+		
+		System.out.println("Printing data properties: ");
+		for (OntologyDataProperty dp : dataProperties) {
+			System.out.println(dp.getName());
+		}
 
 		for (OntologyDataProperty dp : dataProperties) {
 			if (!dp.getName().equals("")) {
-				classEntity = df.getOWLEntity(EntityType.DATA_PROPERTY, IRI.create(ontologyIRI + "#" + StringUtilities.toMixedCase(dp.getName())));
+				//classEntity = df.getOWLEntity(EntityType.DATA_PROPERTY, IRI.create(ontologyIRI + "#" + StringUtilities.toMixedCase(dp.getName())));
+				classEntity = df.getOWLEntity(EntityType.DATA_PROPERTY, IRI.create(ontologyIRI + "#" + dp.getName()));
 				declarationAxiom = df.getOWLDeclarationAxiom(classEntity);
 				manager.addAxiom(onto, declarationAxiom);
 			}
@@ -197,17 +240,14 @@ public class OntologyGenerator {
 
 		}
 
+		System.out.println("Printing domains and ranges axioms for DPs: ");
+		System.out.println(dpDomainsAndRanges);
+
 		onto.add(dpDomainsAndRanges);
 
 		//SAVE ONTOLOGY WITH CLASSES, OBJECT PROPERTIES AND DATA PROPERTIES
 		manager.saveOntology(onto, documentIRI);
-
-		//PRINT STATISTICS
-		System.out.println("Classes: " + onto.getClassesInSignature().size());
-		System.out.println("Object Properties: " + onto.getObjectPropertiesInSignature().size());
-		System.out.println("Data Properties: " + onto.getDataPropertiesInSignature().size());
-
-
+		
 	}
 
 	public static Multimap<String, String> createDPDomainMap (Set<OntologyDataProperty> dataProperties) {
@@ -216,7 +256,8 @@ public class OntologyGenerator {
 
 		for (OntologyDataProperty dp : dataProperties) {
 			if (!dp.getName().equals("")) { 
-				domainMap.put(StringUtilities.toMixedCase(dp.getName()), StringUtilities.toCamelCase(dp.getSourceClassName()));
+				//Transmodel: domainMap.put(StringUtilities.toMixedCase(dp.getName()), StringUtilities.toCamelCase(dp.getSourceClassName()));
+				domainMap.put(dp.getName(), dp.getSourceClassName());
 			}
 		}
 
@@ -230,7 +271,8 @@ public class OntologyGenerator {
 
 		for (OntologyObjectProperty op : objectProperties) {
 			if (!op.getName().equals("")) { //TODO: Double-check why there are blank op.getName() entries in the XMI
-				domainMap.put(StringUtilities.toMixedCase(op.getName()), StringUtilities.toCamelCase(op.getSourceClassName()));
+				//Transmodel: domainMap.put(StringUtilities.toMixedCase(op.getName()), StringUtilities.toCamelCase(op.getSourceClassName()));
+				domainMap.put(op.getName(), op.getSourceClassName());
 			}
 		}
 
@@ -245,7 +287,8 @@ public class OntologyGenerator {
 
 		for (OntologyObjectProperty op : objectProperties) {
 			if (!op.getName().equals("")) { //TODO: Double-check why there are blank op.getName() entries in the XMI
-				rangeMap.put(StringUtilities.toMixedCase(op.getName()), StringUtilities.toCamelCase(op.getTargetClassName()));
+				//Transmodel: rangeMap.put(StringUtilities.toMixedCase(op.getName()), StringUtilities.toCamelCase(op.getTargetClassName()));
+				rangeMap.put(op.getName(), op.getTargetClassName());
 			}
 		}
 

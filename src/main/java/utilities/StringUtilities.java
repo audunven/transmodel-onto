@@ -7,9 +7,9 @@ public class StringUtilities {
 	
 	public static void main(String[] args) {
 		
-		String inputString = "To Lower Case";
+		String inputString = "retrieveContaminantsFrom";
 				
-		System.out.println(toMixedCase(inputString));
+		System.out.println(toLowerCase(inputString));
 		
 	}
 	
@@ -49,6 +49,7 @@ public class StringUtilities {
 		return buf.toString();
 	}
 	
+	//FIXME: This is only relevant for the Transmodel XMI where associations and attributes contain white space, e.g. "prepared by". 
 	public static String toMixedCase (String inputString) {		
 		
 		String mixedCase = null;
@@ -56,11 +57,13 @@ public class StringUtilities {
 		if (inputString.contains(" ")) {
 		
 			mixedCase = CaseUtils.toCamelCase(inputString, false, " ".toCharArray());
+		
 		} else {
 			char c[] = inputString.toCharArray();
 			c[0] += 32;
 			inputString = new String(c);
 			mixedCase = inputString;
+			
 		}
 		
 		return mixedCase;

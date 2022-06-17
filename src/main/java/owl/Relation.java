@@ -4,14 +4,20 @@ package owl;
 public class Relation {
 
 	private String relationId;
+	private String relationType;
+	private String direction;
+	
 	private String sourceClassId;
 	private String sourceClassName;
 	private String sourceRoleName;
+	private String sourceEndType;
+	private String sourceCardinality;
+	
 	private String targetClassId;
 	private String targetClassName;
 	private String targetRoleName;
-	private String relationType;
-	private String direction;
+	private String targetEndType;	
+	private String targetCardinality;
 
 	private Relation (RelationBuilder builder) {
 
@@ -24,6 +30,10 @@ public class Relation {
 		this.targetRoleName = builder.targetRoleName;
 		this.relationType = builder.relationType;
 		this.direction = builder.direction;
+		this.sourceEndType = builder.sourceEndType;
+		this.targetEndType = builder.targetEndType;
+		this.sourceCardinality = builder.sourceCardinality;
+		this.targetCardinality = builder.targetCardinality;
 
 	}
 
@@ -38,6 +48,10 @@ public class Relation {
 		private String targetRoleName;
 		private String relationType;
 		private String direction;
+		private String sourceEndType;
+		private String targetEndType;
+		private String sourceCardinality;
+		private String targetCardinality;
 		
 		public RelationBuilder() {}
 
@@ -85,6 +99,27 @@ public class Relation {
 			this.direction = direction;
 			return this;
 		}
+		
+
+		public RelationBuilder setSourceEndType(String sourceEndType) {
+			this.sourceEndType = sourceEndType;
+			return this;
+		}
+
+		public RelationBuilder setTargetEndType(String targetEndType) {
+			this.targetEndType = targetEndType;
+			return this;
+		}
+
+		public RelationBuilder setSourceCardinality(String sourceCardinality) {
+			this.sourceCardinality = sourceCardinality;
+			return this;
+		}
+
+		public RelationBuilder setTargetCardinality(String targetCardinality) {
+			this.targetCardinality = targetCardinality;
+			return this;
+		}
 
 		public Relation build() {
 			return new Relation(this);
@@ -128,6 +163,21 @@ public class Relation {
 		return direction;
 	}
 
+	public String getSourceEndType() {
+		return sourceEndType;
+	}
+
+	public String getTargetEndType() {
+		return targetEndType;
+	}
+
+	public String getSourceCardinality() {
+		return sourceCardinality;
+	}
+
+	public String getTargetCardinality() {
+		return targetCardinality;
+	}
 
 	public String toString() {
 		return this.sourceClassId + " : " + this.targetClassId + " : " + this.relationType;
