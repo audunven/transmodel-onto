@@ -1,0 +1,23 @@
+	<connector xmi:idref="EAID_AE03599B_087A_4291_9DEB_8F70362E8380">
+				<source xmi:idref="EAID_33F8ABFD_2FAE_462b_8104_258B794977B7">
+					<model ea_localid="69" type="Actor" name="MaaS Provider"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_A5FE5AC8_5D87_49b7_B95F_D492F74A7C05">
+					<model ea_localid="2169" type="UseCase" name="Share revienue and costs"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>

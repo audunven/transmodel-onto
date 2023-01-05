@@ -39,16 +39,10 @@ public class OntologyGenerator {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, ParserConfigurationException, SAXException, IOException, OWLOntologyStorageException {
 		
-//		String xmiFile = "./files/Transmodel_Combined.xml";
-//		String ontologyIRI = "http://www.reisenavet.no/ontologies/transmodelOntoNewModes.owl";
-//		String owlFile = "./files/TransmodelOntoCombined.owl";
-		
-		String xmiFile = "./files/BioDigSirk_160622.xml";
-		String ontologyIRI = "http://www.biodigsirk.no/ontologies/biodigsirkonto.owl";
-		String owlFile = "./files/BioDigSirkOnto.owl";
+		String xmiFile = "./files/Transmodel_Combined.xml";
+		String ontologyIRI = "http://www.reisenavet.no/ontologies/transmodelOntoNewModes.owl";
+		String owlFile = "./files/TransmodelOntoCombined2.owl";
 
-
-		
 		createOntology(xmiFile, owlFile, ontologyIRI);
 
 	}
@@ -94,8 +88,8 @@ public class OntologyGenerator {
 		}
 
 		for (OntologyClass cls : classes) {
-			//Transmodel: classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
-			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + cls.getName()));
+			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
+			//classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + cls.getName()));
 			annotation = df.getOWLAnnotation(df.getRDFSComment(), df.getOWLLiteral(cls.getDefinition(), "en"));			
 			declarationAxiom = df.getOWLDeclarationAxiom(classEntity);
 			annotationAxiom = df.getOWLAnnotationAssertionAxiom(classEntity.asOWLClass().getIRI(), annotation);
@@ -117,12 +111,12 @@ public class OntologyGenerator {
 		OWLAxiom moduleAxiom = null;
 
 		for (OntologyClass cls : classes) {
-			//Transmodel: classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
-			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + cls.getName()));
+			classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getName())));
+			//classEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + cls.getName()));
 
 			if (cls.getParentClass() != null) {//TODO: Check why null is returned in some cases!
-				//Transmodel: parentClassEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getParentClass())));
-				parentClassEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + cls.getParentClass()));
+				parentClassEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + StringUtilities.toCamelCase(cls.getParentClass())));
+				//parentClassEntity = df.getOWLEntity(EntityType.CLASS, IRI.create(ontologyIRI + "#" + cls.getParentClass()));
 				subclassOfAxiom = df.getOWLSubClassOfAxiom(classEntity.asOWLClass(), parentClassEntity.asOWLClass());
 				manager.addAxiom(onto, subclassOfAxiom);
 			}
@@ -147,8 +141,8 @@ public class OntologyGenerator {
 		//FIXME: StringUtilities.toMixedCase is only relevant for the Transmodel XMI where associations and attributes contain white space, e.g. "prepared by".
 		for (OntologyObjectProperty op : objectProperties) {
 			if (!op.getName().equals("")) {
-				//classEntity = df.getOWLEntity(EntityType.OBJECT_PROPERTY, IRI.create(ontologyIRI + "#" + StringUtilities.toLowerCase(op.getName())));
-				classEntity = df.getOWLEntity(EntityType.OBJECT_PROPERTY, IRI.create(ontologyIRI + "#" + op.getName()));
+				classEntity = df.getOWLEntity(EntityType.OBJECT_PROPERTY, IRI.create(ontologyIRI + "#" + StringUtilities.toLowerCase(op.getName())));
+				//classEntity = df.getOWLEntity(EntityType.OBJECT_PROPERTY, IRI.create(ontologyIRI + "#" + op.getName()));
 				System.out.println("Printing classEntity: " + classEntity);
 				declarationAxiom = df.getOWLDeclarationAxiom(classEntity);
 				manager.addAxiom(onto, declarationAxiom);			
@@ -256,8 +250,8 @@ public class OntologyGenerator {
 
 		for (OntologyDataProperty dp : dataProperties) {
 			if (!dp.getName().equals("")) { 
-				//Transmodel: domainMap.put(StringUtilities.toMixedCase(dp.getName()), StringUtilities.toCamelCase(dp.getSourceClassName()));
-				domainMap.put(dp.getName(), dp.getSourceClassName());
+				domainMap.put(StringUtilities.toMixedCase(dp.getName()), StringUtilities.toCamelCase(dp.getSourceClassName()));
+				//domainMap.put(dp.getName(), dp.getSourceClassName());
 			}
 		}
 
@@ -271,8 +265,8 @@ public class OntologyGenerator {
 
 		for (OntologyObjectProperty op : objectProperties) {
 			if (!op.getName().equals("")) { //TODO: Double-check why there are blank op.getName() entries in the XMI
-				//Transmodel: domainMap.put(StringUtilities.toMixedCase(op.getName()), StringUtilities.toCamelCase(op.getSourceClassName()));
-				domainMap.put(op.getName(), op.getSourceClassName());
+				domainMap.put(StringUtilities.toMixedCase(op.getName()), StringUtilities.toCamelCase(op.getSourceClassName()));
+				//domainMap.put(op.getName(), op.getSourceClassName());
 			}
 		}
 
@@ -287,8 +281,8 @@ public class OntologyGenerator {
 
 		for (OntologyObjectProperty op : objectProperties) {
 			if (!op.getName().equals("")) { //TODO: Double-check why there are blank op.getName() entries in the XMI
-				//Transmodel: rangeMap.put(StringUtilities.toMixedCase(op.getName()), StringUtilities.toCamelCase(op.getTargetClassName()));
-				rangeMap.put(op.getName(), op.getTargetClassName());
+				rangeMap.put(StringUtilities.toMixedCase(op.getName()), StringUtilities.toCamelCase(op.getTargetClassName()));
+				//rangeMap.put(op.getName(), op.getTargetClassName());
 			}
 		}
 

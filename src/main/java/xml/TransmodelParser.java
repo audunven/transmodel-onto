@@ -27,9 +27,9 @@ public class TransmodelParser {
 
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
 
-		//String file = "./files/Transmodel_Combined.xml";
+		String file = "./files/Transmodel_Combined.xml";
 
-		String file = "./files/BioDigSirkAV11.xml";
+		//String file = "./files/BioDigSirkAV11.xml";
 
 		//long startTime = System.nanoTime();
 
